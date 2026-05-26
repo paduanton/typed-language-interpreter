@@ -1,0 +1,23 @@
+{
+  "name": "typed-language-interpreter",
+  "version": "0.1.0",
+  "description": "Interpretador em TypeScript para a linguagem L2 com referencias, atribuicao e avaliacao small-step.",
+  "type": "module",
+  "private": true,
+  "packageManager": "npm@11.13.0",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/src/index.js",
+    "test": "node -e \"console.log('Nenhum teste configurado ainda.')\""
+  },
+  "engines": {
+    "node": ">=24.16.0 <25"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}
