@@ -1,6 +1,6 @@
 # typed-language-interpreter
 
-Interpretador em Node.js + TypeScript para a linguagem L2 do enunciado, com construcoes imperativas, referencias, atribuicao, sequenciamento e avaliacao small-step.
+Interpretador em Node.js + TypeScript para a linguagem L2 do enunciado.
 
 ## Requisitos
 
@@ -24,11 +24,13 @@ npm start
 
 ## Estado inicial
 
-A base deste primeiro commit inclui somente:
+A base atual inclui:
 
 - Configuracao de Node.js LTS e TypeScript.
 - Scripts de compilacao, checagem, execucao e teste.
-- Estrutura inicial em `src/`.
+- AST em TypeScript para representar programas L2 diretamente.
+- Inferencia/verificacao de tipos para as regras do enunciado.
+- Estrutura reservada para parser e avaliador small-step, ainda sem implementacao.
 - Roadmap para implementar o interpretador nas proximas etapas.
 
 O plano incremental esta em [docs/roadmap.md](docs/roadmap.md).

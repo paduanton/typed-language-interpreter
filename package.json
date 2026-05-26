@@ -10,7 +10,7 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "dev": "tsx src/index.ts",
     "start": "node dist/src/index.js",
-    "test": "node -e \"console.log('Nenhum teste configurado ainda.')\""
+    "test": "tsx --test test/**/*.test.ts"
   },
   "engines": {
     "node": ">=24.16.0 <25"
