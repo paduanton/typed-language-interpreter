@@ -1,20 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { lexerL2, Token } from "../src/lexer/Lexer.js";
-import { ReadStream } from "node:fs";
-import { Readable } from 'stream';
-
-async function toArrayAsync<T>(async: AsyncGenerator<T>): Promise<T[]> {
-    const array = [];
-    for await (const item of async) {
-        array.push(item);
-    }
-    return array;
-}
+import { lexerL2, toArrayAsync, Token } from "../src/lexer/Lexer.js";
 
 test("Aceita n", async () => {
     const l = lexerL2();
-    const actual = await toArrayAsync(l.readStreamAsync(Readable.from("0 1 2 3 4 5 6 7 8 9") as ReadStream));
+    const actual = await toArrayAsync(l.readStringAsync("0 1 2 3 4 5 6 7 8 9"));
 
     const expected:Token[] = [
         { kind: "Natural", text: "0", location: { row:1, col:1  } },
@@ -35,7 +25,7 @@ test("Aceita n", async () => {
 
 test("Aceita b", async () => {
     const l = lexerL2();
-    const actual = await toArrayAsync(l.readStreamAsync(Readable.from("true false") as ReadStream));
+    const actual = await toArrayAsync(l.readStringAsync("true false"));
 
     const expected:Token[] = [
         { location: { row:1, col:1  }, kind: "Keyword", text: "true"  },
@@ -45,4 +35,24 @@ test("Aceita b", async () => {
 
     assert.deepEqual(actual, expected);
 });
+
+test("Aceita identificador", async () => {
+    const l = lexerL2();
+    const actual = await toArrayAsync(l.readStringAsync("let foo"));
+
+    const expected:Token[] = [
+        { location: { row:1, col:1  }, kind: "Keyword",     text: "let"  },
+        { location: { row:1, col:5  }, kind: "Identifier",  text: "foo"  },
+        { location: { row:2, col:1 },  kind: "EOF",          text: ""    },
+    ];
+
+    assert.deepEqual(actual, expected);
+});
+
+test("Rejeita identificador invalido", async () => {
+    const l = lexerL2();
+    const actual = await toArrayAsync(l.readStringAsync("let 1foo"));
+    assert.equal(actual[1]?.kind, "Error");
+});
+
 

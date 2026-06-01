@@ -1,6 +1,6 @@
 import * as readline from 'node:readline';
 import * as fs from 'fs';
-import { ReadStream } from 'node:fs';
+import { Readable } from 'node:stream';
 
 export type Location = {
     row: number;
@@ -44,7 +44,7 @@ export class Lexer {
         return /\s/.test(word);
     }
 
-    async *readStreamAsync(inputStream: ReadStream): AsyncGenerator<Token> {
+    async *readStreamAsync(inputStream: Readable): AsyncGenerator<Token> {
         const lines = readline.createInterface({
             input: inputStream
         });
@@ -112,12 +112,18 @@ export class Lexer {
         yield* this.readStreamAsync(fs.createReadStream(filePath));
     }
 
-    async dumpFile(filePath: string): Promise<void> {
-        for await(const token of this.readFileAsync(filePath)) {
-            console.log(token);
-        }
+    async *readStringAsync(string: string): AsyncGenerator<Token> {
+        yield* this.readStreamAsync(Readable.from(string));
     }
 }
+
+export async function toArrayAsync<T>(async: AsyncGenerator<T>): Promise<T[]> {
+  const array: T[] = [];
+  for await (const item of async) {
+    array.push(item);
+  }
+  return array;
+};
 
 export function lexerL2(): Lexer {
     return new Lexer(
