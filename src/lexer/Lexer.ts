@@ -122,7 +122,7 @@ export class Lexer {
 export function lexerL2(): Lexer {
     return new Lexer(
         ["=>", ":=", "+", "-", "*", "!", ">", "<", "(", ")", ";", "=", ":"],
-        ["new", "let", "if", "then", "else", "in", "int", "bool", "unit", "ref"],
+        ["new", "while", "let", "if", "then", "else", "in", "int", "bool", "unit", "ref", "true", "false"],
         /[_a-zA-Z][_a-zA-Z0-9]*/,
         /[1-9][0-9]*|0/
     );
