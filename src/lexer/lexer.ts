@@ -10,7 +10,7 @@ export type Location = {
 export type Token =
   | { location: Location; kind: "EOF"; text: "" }
   | { location: Location; kind: "Identifier"; text: string }
-  | { location: Location; kind: "Natural"; text: string }
+  | { location: Location; kind: "Integer"; text: string }
   | { location: Location; kind: "Keyword"; text: string }
   | { location: Location; kind: "Punctuation"; text: string }
   | { location: Location; kind: "Error"; text: string };
@@ -95,7 +95,7 @@ export class Lexer {
                 const naturalMatch = rest.match(this.#naturalPattern);
                 if (naturalMatch) {
                     const text = naturalMatch[0];
-                    yield { location, kind: 'Natural', text };
+                    yield { location, kind: "Integer", text };
                     wordCursor += text.length;
                     continue Q0;
                 }
@@ -128,8 +128,8 @@ export async function toArrayAsync<T>(items: AsyncGenerator<T>): Promise<T[]> {
 export function lexerL2(): Lexer {
     return new Lexer(
         [":=", "+", "!", "<", "(", ")", ";", "=", ":"],
-        ["new", "while", "let", "if", "then", "else", "in", "int", "bool", "unit", "ref", "true", "false"],
+        ["new", "while", "do", "let", "if", "then", "else", "in", "int", "bool", "unit", "ref", "true", "false"],
         /[_a-zA-Z][_a-zA-Z0-9]*/,
-        /[1-9][0-9]*|0/
+        /-?([1-9][0-9]*|0)/
     );
 }

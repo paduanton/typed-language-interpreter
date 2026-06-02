@@ -5,19 +5,20 @@ import type { Token } from "../src/lexer/lexer.js";
 
 test("Aceita n", async () => {
     const l = lexerL2();
-    const actual = await toArrayAsync(l.readStringAsync("0 1 2 3 4 5 6 7 8 9"));
+    const actual = await toArrayAsync(l.readStringAsync("0 1 2 3 4 5 6 7 8 9 -10"));
 
     const expected:Token[] = [
-        { kind: "Natural", text: "0", location: { row:1, col:1  } },
-        { kind: "Natural", text: "1", location: { row:1, col:3  } },
-        { kind: "Natural", text: "2", location: { row:1, col:5  } },
-        { kind: "Natural", text: "3", location: { row:1, col:7  } },
-        { kind: "Natural", text: "4", location: { row:1, col:9  } },
-        { kind: "Natural", text: "5", location: { row:1, col:11 } },
-        { kind: "Natural", text: "6", location: { row:1, col:13 } },
-        { kind: "Natural", text: "7", location: { row:1, col:15 } },
-        { kind: "Natural", text: "8", location: { row:1, col:17 } },
-        { kind: "Natural", text: "9", location: { row:1, col:19 } },
+        { kind: "Integer", text: "0", location: { row:1, col:1  } },
+        { kind: "Integer", text: "1", location: { row:1, col:3  } },
+        { kind: "Integer", text: "2", location: { row:1, col:5  } },
+        { kind: "Integer", text: "3", location: { row:1, col:7  } },
+        { kind: "Integer", text: "4", location: { row:1, col:9  } },
+        { kind: "Integer", text: "5", location: { row:1, col:11 } },
+        { kind: "Integer", text: "6", location: { row:1, col:13 } },
+        { kind: "Integer", text: "7", location: { row:1, col:15 } },
+        { kind: "Integer", text: "8", location: { row:1, col:17 } },
+        { kind: "Integer", text: "9", location: { row:1, col:19 } },
+        { kind: "Integer", text: "-10", location: { row:1, col:21 } },
         { kind: "EOF",     text: "",  location: { row:2, col:1 } },
     ];
 
