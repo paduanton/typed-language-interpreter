@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { lexerL2, toArrayAsync, Token } from "../src/lexer/Lexer.js";
+import { lexerL2, toArrayAsync } from "../src/lexer/lexer.js";
+import type { Token } from "../src/lexer/lexer.js";
 
 test("Aceita n", async () => {
     const l = lexerL2();
@@ -47,6 +48,38 @@ test("Aceita identificador", async () => {
     ];
 
     assert.deepEqual(actual, expected);
+});
+
+test("Aceita pontuacoes da L2", async () => {
+    const l = lexerL2();
+    const actual = await toArrayAsync(l.readStringAsync(":= + ! < ( ) ; = :"));
+
+    const expected: Token[] = [
+        { location: { row: 1, col: 1  }, kind: "Punctuation", text: ":=" },
+        { location: { row: 1, col: 4  }, kind: "Punctuation", text: "+"  },
+        { location: { row: 1, col: 6  }, kind: "Punctuation", text: "!"  },
+        { location: { row: 1, col: 8  }, kind: "Punctuation", text: "<"  },
+        { location: { row: 1, col: 10 }, kind: "Punctuation", text: "("  },
+        { location: { row: 1, col: 12 }, kind: "Punctuation", text: ")"  },
+        { location: { row: 1, col: 14 }, kind: "Punctuation", text: ";"  },
+        { location: { row: 1, col: 16 }, kind: "Punctuation", text: "="  },
+        { location: { row: 1, col: 18 }, kind: "Punctuation", text: ":"  },
+        { location: { row: 2, col: 1  }, kind: "EOF", text: "" },
+    ];
+
+    assert.deepEqual(actual, expected);
+});
+
+test("Nao acumula localizacao entre leituras da mesma instancia", async () => {
+    const l = lexerL2();
+
+    await toArrayAsync(l.readStringAsync("let x"));
+    const actual = await toArrayAsync(l.readStringAsync("true"));
+
+    assert.deepEqual(actual, [
+        { location: { row: 1, col: 1 }, kind: "Keyword", text: "true" },
+        { location: { row: 2, col: 1 }, kind: "EOF", text: "" },
+    ]);
 });
 
 test("Rejeita identificador invalido", async () => {

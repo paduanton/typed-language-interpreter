@@ -1,26 +1,25 @@
-import * as readline from 'node:readline';
-import * as fs from 'fs';
-import { Readable } from 'node:stream';
+import * as fs from "node:fs";
+import * as readline from "node:readline";
+import { Readable } from "node:stream";
 
 export type Location = {
     row: number;
     col: number;
 };
 
-export type Token = { location: Location; kind: 'EOF';         text: ''     }  
-                  | { location: Location; kind: 'Identifier';  text: string }  
-                  | { location: Location; kind: 'Natural';     text: string }  
-                  | { location: Location; kind: 'Keyword';     text: string }  
-                  | { location: Location; kind: 'Punctuation'; text: string }
-                  | { location: Location; kind: 'Error';       text: string }
-                  ;  
+export type Token =
+  | { location: Location; kind: "EOF"; text: "" }
+  | { location: Location; kind: "Identifier"; text: string }
+  | { location: Location; kind: "Natural"; text: string }
+  | { location: Location; kind: "Keyword"; text: string }
+  | { location: Location; kind: "Punctuation"; text: string }
+  | { location: Location; kind: "Error"; text: string };
 
 export class Lexer {
     #punctuations:       string[];
     #keywords:           string[];
     #identifierPattern:  RegExp;
     #naturalPattern:     RegExp;
-    #location:           Location;
     
     #fixRegex(regex: RegExp): RegExp {
         return new RegExp(`^(${regex.source})$`, regex.flags);
@@ -31,7 +30,6 @@ export class Lexer {
         this.#keywords          = keywords;
         this.#identifierPattern = this.#fixRegex(identifierPattern);
         this.#naturalPattern    = this.#fixRegex(naturalPattern);
-        this.#location          = {row:1,col:1};
         
         this.#punctuations.sort((a, b) => b.length - a.length);
     }
@@ -48,6 +46,8 @@ export class Lexer {
         const lines = readline.createInterface({
             input: inputStream
         });
+        let row = 1;
+
         for await (let line of lines) {
             let wordCursor = 0;
             Q0: while(wordCursor < line.length) {
@@ -68,7 +68,7 @@ export class Lexer {
                 }
 
                 const rest = line.slice(wordCursor, wordEnd);
-                const location = { row: this.#location.row, col: wordCursor + 1 };
+                const location = { row, col: wordCursor + 1 };
                  
                 for (const punct of this.#punctuations) {
                     if (rest.startsWith(punct)) {
@@ -103,9 +103,9 @@ export class Lexer {
                 yield { location, kind: 'Error', text: `Invalid Token: "${rest}"`};
                 return;
             }
-            this.#location.row += 1;
+            row += 1;
         }
-        yield { location: this.#location, kind: "EOF", text:"" };
+        yield { location: { row, col: 1 }, kind: "EOF", text: "" };
     }
 
     async *readFileAsync(filePath: string): AsyncGenerator<Token> {
@@ -117,17 +117,17 @@ export class Lexer {
     }
 }
 
-export async function toArrayAsync<T>(async: AsyncGenerator<T>): Promise<T[]> {
+export async function toArrayAsync<T>(items: AsyncGenerator<T>): Promise<T[]> {
   const array: T[] = [];
-  for await (const item of async) {
+  for await (const item of items) {
     array.push(item);
   }
   return array;
-};
+}
 
 export function lexerL2(): Lexer {
     return new Lexer(
-        ["=>", ":=", "+", "-", "*", "!", ">", "<", "(", ")", ";", "=", ":"],
+        [":=", "+", "!", "<", "(", ")", ";", "=", ":"],
         ["new", "while", "let", "if", "then", "else", "in", "int", "bool", "unit", "ref", "true", "false"],
         /[_a-zA-Z][_a-zA-Z0-9]*/,
         /[1-9][0-9]*|0/
