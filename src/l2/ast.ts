@@ -6,18 +6,24 @@ export type L2Type =
 
 export type BinaryOperator = "+" | "<" | "=";
 
+export type BinaryOperation = { kind: "binary"; operator: BinaryOperator; left: L2Expression; right: L2Expression }
+export type IfThenElse      = { kind: "if"; condition: L2Expression; thenBranch: L2Expression; elseBranch: L2Expression }
+export type LetExpression   = { kind: "let"; name: string; annotation: L2Type; value: L2Expression; body: L2Expression }
+export type Variable        = { kind: "variable"; name: string }
+export type SeqExpression   = { kind: "seq"; first: L2Expression; second: L2Expression }
+
 export type L2Expression =
   | { kind: "int"; value: number }
   | { kind: "bool"; value: boolean }
   | { kind: "unit" }
-  | { kind: "variable"; name: string }
-  | { kind: "binary"; operator: BinaryOperator; left: L2Expression; right: L2Expression }
-  | { kind: "if"; condition: L2Expression; thenBranch: L2Expression; elseBranch: L2Expression }
-  | { kind: "let"; name: string; annotation: L2Type; value: L2Expression; body: L2Expression }
+  | Variable
+  | BinaryOperation
+  | IfThenElse
+  | LetExpression
+  | SeqExpression
   | { kind: "assign"; reference: L2Expression; value: L2Expression }
   | { kind: "deref"; reference: L2Expression }
   | { kind: "new"; value: L2Expression }
-  | { kind: "seq"; first: L2Expression; second: L2Expression }
   | { kind: "while"; condition: L2Expression; body: L2Expression };
 
 export const type = {
