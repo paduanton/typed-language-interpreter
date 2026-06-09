@@ -1,0 +1,4 @@
+let x: ref int = new 0 in (
+  while !x < 3 do x := !x + 1;
+  !x
+)

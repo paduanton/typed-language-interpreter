@@ -1,0 +1,4 @@
+let counter: ref int = new 0 in (
+  while !counter < 5 do counter := !counter + 1;
+  !counter
+)

@@ -1,0 +1,4 @@
+let cell: ref int = new 0 in (
+  cell := 41;
+  !cell + 1
+)
