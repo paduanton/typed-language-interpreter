@@ -1,5 +1,5 @@
 import { expr, type, type BinaryOperator, type L2Expression, type L2Type } from "../l2/ast.js";
-import { ParseError } from "../l2/errors.js";
+import { LexicalError, ParseError } from "../l2/errors.js";
 import { lexerL2, toArrayAsync, type Token } from "../lexer/lexer.js";
 
 export async function parse(source: string): Promise<L2Expression> {
@@ -7,6 +7,11 @@ export async function parse(source: string): Promise<L2Expression> {
 }
 
 export function parseTokens(tokens: readonly Token[]): L2Expression {
+  const lexicalError = tokens.find((token) => token.kind === "Error");
+  if (lexicalError) {
+    throw new LexicalError(`${lexicalError.text} em ${lexicalError.location.row}:${lexicalError.location.col}.`);
+  }
+
   const parser = new Parser(tokens);
   const expression = parser.parseExpression();
   parser.expectEOF();

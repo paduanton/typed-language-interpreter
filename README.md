@@ -16,8 +16,9 @@ npm install
 npm run check
 npm test
 npm run build
-npm run dev
-npm start
+npm run dev -- examples/basic.l2
+npm run dev -- -e "let x: ref int = new 0 in (x := 1; !x)"
+npm start -- examples/basic.l2
 ```
 
 ## Estado atual
@@ -29,7 +30,25 @@ A base atual inclui:
 - AST em TypeScript para representar programas L2 diretamente.
 - Lexer e parser para gerar AST a partir da sintaxe concreta da L2.
 - Inferencia/verificacao de tipos para as regras do enunciado.
-- Estrutura reservada para avaliador small-step, ainda sem implementacao.
+- Avaliador small-step com store para referencias e localizacoes internas.
+- CLI para executar programas L2 a partir de arquivo, stdin ou `-e`.
+
+## Exemplo
+
+```l2
+let x: ref int = new 0 in (
+  while !x < 3 do x := !x + 1;
+  !x
+)
+```
+
+```text
+type: int
+value: 3
+steps: 32
+```
+
+O operador `=` tambem e aceito como extensao para igualdade entre valores do mesmo tipo.
 
 ## Documentacao
 

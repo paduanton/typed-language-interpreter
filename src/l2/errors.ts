@@ -6,5 +6,7 @@ export class L2Error extends Error {
 }
 
 export class TypeInferenceError extends L2Error {}
+export class LexicalError extends L2Error {}
 export class ParseError extends L2Error {}
+export class RuntimeError extends L2Error {}
 export class NotImplementedL2Error extends L2Error {}

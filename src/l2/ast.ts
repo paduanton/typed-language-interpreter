@@ -11,11 +11,14 @@ export type IfThenElse      = { kind: "if"; condition: L2Expression; thenBranch:
 export type LetExpression   = { kind: "let"; name: string; annotation: L2Type; value: L2Expression; body: L2Expression }
 export type Variable        = { kind: "variable"; name: string }
 export type SeqExpression   = { kind: "seq"; first: L2Expression; second: L2Expression }
-
-export type L2Expression =
+export type ValueExpression =
   | { kind: "int"; value: number }
   | { kind: "bool"; value: boolean }
   | { kind: "unit" }
+  | { kind: "location"; address: number };
+
+export type L2Expression =
+  | ValueExpression
   | Variable
   | BinaryOperation
   | IfThenElse
@@ -37,6 +40,7 @@ export const expr = {
   int: (value: number): L2Expression => ({ kind: "int", value }),
   bool: (value: boolean): L2Expression => ({ kind: "bool", value }),
   unit: (): L2Expression => ({ kind: "unit" }),
+  location: (address: number): L2Expression => ({ kind: "location", address }),
   variable: (name: string): L2Expression => ({ kind: "variable", name }),
   binary: (operator: BinaryOperator, left: L2Expression, right: L2Expression): L2Expression => ({
     kind: "binary",

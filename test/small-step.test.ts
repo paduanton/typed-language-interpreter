@@ -1,84 +1,74 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { l2IsTerminal, l2EvalSmallStep, SmallStepInterpreter } from "../src/evaluator/evaluator.js";
-import { expr, type } from "../src/index.js";
+import { l2Evaluate, l2EvalSmallStep, l2IsTerminal, l2StepSmallStep } from "../src/evaluator/evaluator.js";
+import { expr, RuntimeError, type } from "../src/index.js";
 
-const { binary, int, ifThenElse, letIn, unit, variable, seq } = expr;
+const { assign, binary, bool, deref, ifThenElse, int, letIn, newRef, seq, unit, variable, whileDo } = expr;
 
-test("Avalia Soma (+)", () => {
-    const exp      = binary("+", int(34), int(35));
-    const actual   = l2EvalSmallStep(exp);
-    const expected = int(69);
-    assert.strictEqual(l2IsTerminal(actual), true);
-    assert.deepStrictEqual(actual, expected);
+test("avalia operadores +, < e =", () => {
+  assert.deepStrictEqual(l2EvalSmallStep(binary("+", int(34), int(35))), int(69));
+  assert.deepStrictEqual(l2EvalSmallStep(binary("<", int(34), int(35))), bool(true));
+  assert.deepStrictEqual(l2EvalSmallStep(binary("=", int(35), int(35))), bool(true));
 });
 
-test("Avalia Then", () => {
-    const exp = ifThenElse(binary("=", int(1), int(1)), int(69), int(420));
-    const actual   = l2EvalSmallStep(exp);
-    const expected = int(69);
-    assert.strictEqual(l2IsTerminal(actual), true);
-    assert.deepStrictEqual(actual, expected);
+test("avalia if por small-step", () => {
+  assert.deepStrictEqual(l2EvalSmallStep(ifThenElse(bool(true), int(69), int(420))), int(69));
+  assert.deepStrictEqual(l2EvalSmallStep(ifThenElse(bool(false), int(69), int(420))), int(420));
 });
 
-test("Avalia Else", () => {
-    const exp = ifThenElse(binary("=", int(1), int(0)), int(69), int(420));
-    const actual   = l2EvalSmallStep(exp);
-    const expected = int(420);
-    assert.strictEqual(l2IsTerminal(actual), true);
-    assert.deepStrictEqual(actual, expected);
+test("avalia let por substituicao com shadowing lexico", () => {
+  const program = letIn(
+    "a",
+    type.int(),
+    int(34),
+    letIn("a", type.int(), int(35), variable("a")),
+  );
+
+  assert.deepStrictEqual(l2EvalSmallStep(program), int(35));
 });
 
-test("Avalia LetIn", () => {
-    const interpreter = new SmallStepInterpreter();
-    const exp         = letIn("nice", type.int(), int(69), unit());
-    const result      = l2EvalSmallStep(exp, interpreter);
-    assert.deepEqual(result, unit());
-    assert.strictEqual(interpreter.bindings[0]?.name, "nice", "Let Name");
-    assert.deepStrictEqual(interpreter.bindings[0]?.value, int(69), "Let Value");
+test("nao vaza escopo de let para fora da sequencia", () => {
+  const program = seq(
+    letIn("a", type.int(), int(420), unit()),
+    variable("a"),
+  );
+
+  assert.throws(() => l2EvalSmallStep(program), RuntimeError);
 });
 
-test("Avalia var", () => {
-    const exp         = letIn("nice", type.int(), int(69), variable("nice"));
-    const result      = l2EvalSmallStep(exp);
-    assert.deepStrictEqual(result, int(69));
+test("avalia new, deref e atribuicao com store", () => {
+  const program = letIn(
+    "x",
+    type.ref(type.int()),
+    newRef(int(0)),
+    seq(assign(variable("x"), int(41)), binary("+", deref(variable("x")), int(1))),
+  );
+
+  const result = l2Evaluate(program);
+  assert.deepStrictEqual(result.value, int(42));
+  assert.deepStrictEqual(result.store.get(0), int(41));
 });
 
-test("Avalia nested var", () => {
-    const exp         = letIn("a", type.int(), int(34), 
-                            letIn("a", type.int(), int(35),
-                                variable("a")
-                            )
-                        );
-    const result      = l2EvalSmallStep(exp);
-    assert.deepStrictEqual(result, int(35));
+test("avalia while por desdobramento para if", () => {
+  const program = letIn(
+    "x",
+    type.ref(type.int()),
+    newRef(int(0)),
+    seq(
+      whileDo(
+        binary("<", deref(variable("x")), int(3)),
+        assign(variable("x"), binary("+", deref(variable("x")), int(1))),
+      ),
+      deref(variable("x")),
+    ),
+  );
+
+  assert.deepStrictEqual(l2EvalSmallStep(program), int(3));
 });
 
-test("Avalia add a + b", () => {
-    const exp         = letIn("a", type.int(), int(34), 
-                            letIn("b", type.int(), int(35),
-                                  binary("+", variable("a"), variable("b"))
-                                 )
-                             );
-    const result      = l2EvalSmallStep(exp);
-    assert.deepStrictEqual(result, int(69));
-});
+test("executa um passo por vez", () => {
+  const first = l2StepSmallStep({ expression: binary("+", int(1), int(2)), store: new Map() });
 
-test("Hoisting nao ocorre em let in", () => {
-    const exp         = letIn("a", type.int(), variable("b"), 
-                              letIn("b", type.int(), int(35),
-                                binary("+", variable("a"), variable("b"))
-                                   )
-                             );
-    const result      = l2EvalSmallStep(exp);
-    assert.notDeepStrictEqual(result, int(70));
-});
-
-test("Avalia Seq", () => {
-    const exp         = seq(
-        letIn("a", type.int(), int(420), variable("a")),
-        variable("a")
-    );
-    const result      = l2EvalSmallStep(exp);
-    assert.deepStrictEqual(result, variable("a"))
+  assert.deepStrictEqual(first?.expression, int(3));
+  assert.strictEqual(l2IsTerminal(first!.expression), true);
 });

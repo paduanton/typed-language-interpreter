@@ -11,6 +11,8 @@ export function inferType(expression: L2Expression, environment: TypeEnvironment
       return { kind: "bool" };
     case "unit":
       return { kind: "unit" };
+    case "location":
+      throw new TypeInferenceError("Localizacoes de memoria sao internas ao avaliador e nao possuem tipo na sintaxe fonte.");
     case "variable":
       return inferVariable(expression.name, environment);
     case "binary":
