@@ -144,12 +144,6 @@ function stepLet(expression: Extract<L2Expression, { kind: "let" }>, store: Stor
 }
 
 function stepAssign(expression: Extract<L2Expression, { kind: "assign" }>, store: Store): SmallStepState {
-  if (!l2IsTerminal(expression.reference)) {
-    const next = l2StepSmallStep({ expression: expression.reference, store });
-    if (!next) throw new RuntimeError("Referencia de atribuicao irredutivel.");
-    return { expression: { ...expression, reference: next.expression }, store: next.store };
-  }
-
   if (!l2IsTerminal(expression.value)) {
     const next = l2StepSmallStep({ expression: expression.value, store });
     if (!next) throw new RuntimeError("Valor de atribuicao irredutivel.");
@@ -157,7 +151,7 @@ function stepAssign(expression: Extract<L2Expression, { kind: "assign" }>, store
   }
 
   if (expression.reference.kind !== "location") {
-    throw new RuntimeError("O lado esquerdo de := deve avaliar para uma localizacao.");
+    throw new RuntimeError("O lado esquerdo de := deve ser uma localizacao interna.");
   }
 
   if (!store.has(expression.reference.address)) {

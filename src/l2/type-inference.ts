@@ -28,7 +28,10 @@ export function inferType(expression: L2Expression, environment: TypeEnvironment
       );
       return inferType(expression.body, extendEnvironment(environment, expression.name, expression.annotation));
     case "assign": {
-      const referenceType = inferType(expression.reference, environment);
+      if (expression.reference.kind !== "variable") {
+        throw new TypeInferenceError("O lado esquerdo de := deve ser uma variavel de tipo ref T.");
+      }
+      const referenceType = inferVariable(expression.reference.name, environment);
       if (referenceType.kind !== "ref") throw new TypeInferenceError("O lado esquerdo de := deve ter tipo ref T.");
       expectType(
         inferType(expression.value, environment),

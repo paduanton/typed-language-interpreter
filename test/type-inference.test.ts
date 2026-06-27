@@ -41,6 +41,7 @@ test("infere referencias, atribuicao, dereferencia, sequencia e while", () => {
 test("rejeita programas que violam regras de tipos", () => {
   assert.throws(() => inferType(expr.binary("+", expr.bool(true), expr.int(1))), TypeInferenceError);
   assert.throws(() => inferType(expr.ifThenElse(expr.bool(true), expr.int(1), expr.bool(false))), TypeInferenceError);
+  assert.throws(() => inferType(expr.assign(expr.deref(expr.newRef(expr.int(1))), expr.int(2))), TypeInferenceError);
   assert.throws(() => inferType(expr.deref(expr.int(1))), TypeInferenceError);
   assert.throws(() => inferType(expr.whileDo(expr.bool(true), expr.int(1))), TypeInferenceError);
 });
