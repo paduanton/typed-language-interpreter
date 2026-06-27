@@ -1,5 +1,5 @@
-let a: ref int = new 1 in (
+let a: ref int = new 1 in {
   a := !a + 1;
   a := !a + 1;
   !a
-)
+}

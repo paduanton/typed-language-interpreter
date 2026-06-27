@@ -17,7 +17,7 @@ npm run check
 npm test
 npm run build
 npm run dev -- examples/basic.l2
-npm run dev -- -e "let x: ref int = new 0 in (x := 1; !x)"
+npm run dev -- -e "let x: ref int = new 0 in { x := 1; !x }"
 npm start -- examples/basic.l2
 ```
 
@@ -36,10 +36,10 @@ A base atual inclui:
 ## Exemplo
 
 ```l2
-let x: ref int = new 0 in (
-  while !x < 3 do x := !x + 1;
+let x: ref int = new 0 in {
+  while !x < 3 do { x := !x + 1 };
   !x
-)
+}
 ```
 
 ```text
@@ -52,4 +52,4 @@ O operador `=` tambem e aceito como extensao para igualdade entre valores do mes
 
 ## Documentacao
 
-- [Enunciado L2](docs/enunciado.md)
+- [Definicao da L2](docs/definition.md)

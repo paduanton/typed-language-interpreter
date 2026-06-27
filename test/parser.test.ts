@@ -14,7 +14,7 @@ test("parseia literais, variaveis, unit e operadores", async () => {
 });
 
 test("parseia let, if, referencias, atribuicao, sequencia e while", async () => {
-  const program = await parse("let x: ref int = new 0 in (while !x < 3 do x := !x + 1; !x)");
+  const program = await parse("let x: ref int = new 0 in { while !x < 3 do { x := !x + 1 }; !x }");
 
   assert.deepEqual(
     program,
@@ -35,7 +35,7 @@ test("parseia let, if, referencias, atribuicao, sequencia e while", async () => 
 });
 
 test("parseia anotacoes de tipo compostas", async () => {
-  const program = await parse("let x: ref ref bool = new new true in !!x");
+  const program = await parse("let x: ref ref bool = new new true in { !!x }");
 
   assert.equal(formatType(inferType(program)), "bool");
 });

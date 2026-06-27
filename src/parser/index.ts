@@ -41,6 +41,9 @@ class Parser {
     const reference = this.#parseComparison();
 
     if (this.#matchPunctuation(":=")) {
+      if (reference.kind !== "variable") {
+        throw this.#error("O lado esquerdo de := deve ser uma variavel.");
+      }
       return expr.assign(reference, this.#parseAssignment());
     }
 
@@ -87,21 +90,21 @@ class Parser {
       this.#expectPunctuation("=");
       const value = this.parseExpression();
       this.#expectKeyword("in");
-      return expr.letIn(name, annotation, value, this.parseExpression());
+      return expr.letIn(name, annotation, value, this.#parseBlock());
     }
 
     if (this.#matchKeyword("if")) {
       const condition = this.parseExpression();
       this.#expectKeyword("then");
-      const thenBranch = this.parseExpression();
+      const thenBranch = this.#parseBlock();
       this.#expectKeyword("else");
-      return expr.ifThenElse(condition, thenBranch, this.parseExpression());
+      return expr.ifThenElse(condition, thenBranch, this.#parseBlock());
     }
 
     if (this.#matchKeyword("while")) {
       const condition = this.parseExpression();
       this.#expectKeyword("do");
-      return expr.whileDo(condition, this.#parseAssignment());
+      return expr.whileDo(condition, this.#parseBlock());
     }
 
     if (this.#matchPunctuation("(")) {
@@ -113,6 +116,13 @@ class Parser {
     }
 
     throw this.#error(`Expressao esperada, obtido ${this.#describe(this.#peek())}.`);
+  }
+
+  #parseBlock(): L2Expression {
+    this.#expectPunctuation("{");
+    const expression = this.parseExpression();
+    this.#expectPunctuation("}");
+    return expression;
   }
 
   #parseType(): L2Type {

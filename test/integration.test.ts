@@ -4,7 +4,7 @@ import test from "node:test";
 import { formatType, inferType, l2Evaluate, parse } from "../src/index.js";
 
 test("executa programa L2 completo a partir de texto fonte", async () => {
-  const source = "let x: ref int = new 0 in (while !x < 3 do x := !x + 1; !x)";
+  const source = "let x: ref int = new 0 in { while !x < 3 do { x := !x + 1 }; !x }";
   const expression = await parse(source);
   const inferredType = inferType(expression);
   const result = l2Evaluate(expression);
@@ -14,7 +14,7 @@ test("executa programa L2 completo a partir de texto fonte", async () => {
 });
 
 test("rejeita erro lexico antes da analise sintatica", async () => {
-  await assert.rejects(() => parse("let x: int = 1 @ in x"), {
+  await assert.rejects(() => parse("let x: int = 1 @ in { x }"), {
     name: "LexicalError",
   });
 });

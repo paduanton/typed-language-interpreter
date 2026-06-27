@@ -53,7 +53,7 @@ test("Aceita identificador", async () => {
 
 test("Aceita pontuacoes da L2", async () => {
     const l = lexerL2();
-    const actual = await toArrayAsync(l.readStringAsync(":= + ! < ( ) ; = :"));
+    const actual = await toArrayAsync(l.readStringAsync(":= + ! < ( ) { } ; = :"));
 
     const expected: Token[] = [
         { location: { row: 1, col: 1  }, kind: "Punctuation", text: ":=" },
@@ -62,9 +62,11 @@ test("Aceita pontuacoes da L2", async () => {
         { location: { row: 1, col: 8  }, kind: "Punctuation", text: "<"  },
         { location: { row: 1, col: 10 }, kind: "Punctuation", text: "("  },
         { location: { row: 1, col: 12 }, kind: "Punctuation", text: ")"  },
-        { location: { row: 1, col: 14 }, kind: "Punctuation", text: ";"  },
-        { location: { row: 1, col: 16 }, kind: "Punctuation", text: "="  },
-        { location: { row: 1, col: 18 }, kind: "Punctuation", text: ":"  },
+        { location: { row: 1, col: 14 }, kind: "Punctuation", text: "{"  },
+        { location: { row: 1, col: 16 }, kind: "Punctuation", text: "}"  },
+        { location: { row: 1, col: 18 }, kind: "Punctuation", text: ";"  },
+        { location: { row: 1, col: 20 }, kind: "Punctuation", text: "="  },
+        { location: { row: 1, col: 22 }, kind: "Punctuation", text: ":"  },
         { location: { row: 2, col: 1  }, kind: "EOF", text: "" },
     ];
 
